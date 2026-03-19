@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Source &mdash; Cloak of Darkness</title>
+<title>Source &mdash; Cloak of Darkness (Ink)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -263,9 +263,35 @@ tr.highlight td.ln {
   outline: 1px solid #aa9930;
 }
 
-/* --- Responsive --- */
-@media (max-width: 700px) {
-  .sidebar { display: none; }
+/* --- Sidebar toggle --- */
+.sidebar-toggle {
+  background: none;
+  border: 1px solid #2a2418;
+  border-radius: 4px;
+  color: #887755;
+  font-size: 1em;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s;
+  padding: 0;
+  line-height: 1;
+  font-family: inherit;
+}
+
+.sidebar-toggle:hover {
+  color: #c4b48a;
+  border-color: #5a4a30;
+}
+
+.sidebar-toggle.visible { display: flex; }
+
+.sidebar.collapsed {
+  display: none;
 }
 </style>
 </head>
@@ -274,13 +300,14 @@ tr.highlight td.ln {
 <div class="container">
   <div class="sidebar">
     <div class="sidebar-header">
-      <h1>Cloak of Darkness: Source</h1>
+      <h1>Cloak of Darkness (Ink): Source</h1>
     </div>
     <div class="nav" id="nav"></div>
   </div>
   <div class="main">
     <div class="toolbar">
-      <span class="file-path">C:/code/ifhub/projects/cloak-ink/cloak-of-darkness.ink</span>
+      <button class="sidebar-toggle" id="sidebar-toggle" title="Toggle outline">&#9664;</button>
+      <span class="file-path">projects/cloak-ink/cloak-of-darkness.ink</span>
       <input type="text" class="search-box" id="search" placeholder="Search... (Ctrl+F)">
       <span class="line-count" id="line-count"></span>
     </div>
@@ -291,7 +318,7 @@ tr.highlight td.ln {
 </div>
 
 <script>
-const RAW_URL = 'C:/code/ifhub/projects/cloak-ink/cloak-of-darkness.ink';
+const RAW_URL = 'projects/cloak-ink/cloak-of-darkness.ink';
 const headingRe = /^(Volume|Book|Part|Chapter|Section)\s+(.+)/;
 
 /* ---- Inform 7 Syntax Highlighter ---- */
@@ -452,6 +479,21 @@ async function init() {
 
   wrap.innerHTML = '<table class="code">' + rows.join('') + '</table>';
   nav.innerHTML = navItems.join('');
+
+  // Sidebar visibility: hide entirely if no sections, show toggle if sections exist
+  const sidebar = document.querySelector('.sidebar');
+  const toggleBtn = document.getElementById('sidebar-toggle');
+
+  if (navItems.length === 0) {
+    sidebar.classList.add('collapsed');
+  } else {
+    toggleBtn.classList.add('visible');
+    toggleBtn.addEventListener('click', function() {
+      const collapsed = sidebar.classList.toggle('collapsed');
+      toggleBtn.innerHTML = collapsed ? '&#9654;' : '&#9664;';
+      toggleBtn.title = collapsed ? 'Show outline' : 'Hide outline';
+    });
+  }
 
   // Nav click handler — highlight active
   nav.addEventListener('click', function(e) {
